@@ -37,7 +37,7 @@ namespace Infrastructure.Data
                 query = query.Where(x => x.Type == type);
 
             query = sort switch
-            {
+            {  
                 "priceAsc" => query.OrderBy(x => x.Price),
                 "priceDsc" => query.OrderByDescending(x => x.Price),
                  _ => query.OrderBy(x => x.Name)
