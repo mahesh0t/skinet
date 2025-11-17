@@ -5,6 +5,7 @@ using Core.Interfaces;
 using API.Middleware;
 using StackExchange.Redis;
 using Infrastructure.Services;
+using Core.Entities;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -26,6 +27,9 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(config =>
 });
 
 builder.Services.AddSingleton<ICartService, CartService>();
+builder.Services.AddAuthentication();
+builder.Services.AddAuthorization();
+builder.Services.AddIdentityApiEndpoints<AppUser>().AddEntityFrameworkStores<StoreContext>();
 
 var app = builder.Build();
 
@@ -33,8 +37,12 @@ var app = builder.Build();
 
 app.UseMiddleware<ExceptionMiddleware>();
 
-app.UseCors(x => x.AllowAnyHeader().AllowAnyHeader().WithOrigins("http://localhost:4200","https://localhost:4200"));
+app.UseCors(x => x.AllowAnyHeader().AllowAnyHeader().AllowCredentials().WithOrigins("http://localhost:4200","https://localhost:4200"));
+app.UseAuthentication();
+app.UseAuthorization();
+
 app.MapControllers();
+ app.MapGroup("api").MapIdentityApi<AppUser>(); //api login
 
 try
 {
